@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
 <title>刷卡查詢</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -23,16 +23,18 @@
     --green-l:#DCEEE3;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
   body{
     margin:0;
     background:var(--paper);
     font-family:'Noto Sans TC',sans-serif;
     color:var(--text);
-    padding-bottom:60px;
+    padding-bottom:calc(50px + env(safe-area-inset-bottom));
+    -webkit-font-smoothing:antialiased;
   }
   header{
     background:var(--ink);
-    padding:28px 20px 22px;
+    padding:calc(20px + env(safe-area-inset-top)) 18px 14px;
     position:sticky;
     top:0;
     z-index:10;
@@ -40,61 +42,77 @@
   header h1{
     font-family:'Noto Serif TC',serif;
     color:#F6F3EC;
-    font-size:22px;
-    margin:0 0 4px;
+    font-size:20px;
+    margin:0 0 3px;
     letter-spacing:0.02em;
   }
   header p{
     color:#9FB0C9;
-    font-size:12.5px;
-    margin:0 0 14px;
+    font-size:12px;
+    margin:0 0 12px;
+    line-height:1.4;
   }
   #search{
     width:100%;
-    padding:11px 14px;
+    padding:12px 14px;
     border-radius:10px;
-    border:none;
-    font-size:15px;
+    font-size:16px;
     font-family:inherit;
-    background:#1F3served;
-  }
-  #search{
-    background:rgba(255,255,255,0.08);
-    border:1px solid rgba(255,255,255,0.15);
+    background:rgba(255,255,255,0.09);
+    border:1px solid rgba(255,255,255,0.18);
     color:#F6F3EC;
+    -webkit-appearance:none;
+    appearance:none;
+    display:block;
   }
-  #search::placeholder{color:#7F91AC;}
+  #search::placeholder{color:#8A9BB8;}
+  #search:focus{outline:none;border-color:var(--gold);background:rgba(255,255,255,0.13);}
+  .tabs-wrap{
+    background:var(--paper);
+    position:sticky;
+    top:calc(96px + env(safe-area-inset-top));
+    z-index:9;
+    padding:10px 0 8px;
+    border-bottom:1px solid var(--line);
+  }
   .tabs{
     display:flex;
-    gap:6px;
+    gap:7px;
     overflow-x:auto;
-    padding:14px 20px 0;
+    padding:0 18px;
     scrollbar-width:none;
+    -webkit-overflow-scrolling:touch;
   }
   .tabs::-webkit-scrollbar{display:none;}
   .tab{
     flex:0 0 auto;
-    padding:7px 14px;
+    padding:9px 15px;
+    min-height:38px;
+    display:flex;
+    align-items:center;
     border-radius:999px;
     border:1px solid var(--line);
     background:var(--card);
-    font-size:13px;
+    font-size:13.5px;
     color:var(--text2);
     white-space:nowrap;
     cursor:pointer;
+    user-select:none;
   }
+  .tab:active{transform:scale(0.96);}
   .tab.active{
     background:var(--ink);
     color:#F6F3EC;
     border-color:var(--ink);
+    font-weight:500;
   }
-  main{padding:16px 20px 0;}
+  main{padding:14px 16px 0;}
   .group-title{
     font-family:'Noto Serif TC',serif;
     font-weight:700;
     font-size:14px;
     color:var(--gold-d);
-    margin:22px 0 10px;
+    margin:20px 2px 9px;
     display:flex;
     align-items:center;
     gap:8px;
@@ -110,7 +128,7 @@
     border:1px solid var(--line);
     border-radius:14px;
     padding:14px 16px;
-    margin-bottom:10px;
+    margin-bottom:9px;
     display:none;
   }
   .item.show{display:block;}
@@ -124,38 +142,43 @@
     font-size:15.5px;
     font-weight:700;
     color:var(--text);
+    line-height:1.35;
   }
   .rate{
     font-family:'JetBrains Mono',monospace;
     font-weight:700;
-    font-size:17px;
+    font-size:18px;
     color:var(--green);
     white-space:nowrap;
+    flex:0 0 auto;
   }
   .card-line{
-    margin-top:6px;
-    font-size:13.5px;
+    margin-top:7px;
+    font-size:14px;
     color:var(--ink2);
     font-weight:500;
+    line-height:1.4;
   }
   .pay-line{
-    margin-top:2px;
-    font-size:12.5px;
+    margin-top:3px;
+    font-size:13px;
     color:var(--text2);
+    line-height:1.45;
   }
   .tags{
-    margin-top:9px;
+    margin-top:10px;
     display:flex;
     gap:6px;
     flex-wrap:wrap;
   }
   .tag{
-    font-size:10.5px;
-    padding:3px 8px;
+    font-size:11px;
+    padding:4px 9px;
     border-radius:6px;
     background:var(--gold-l);
     color:var(--gold-d);
     font-weight:500;
+    line-height:1.4;
   }
   .tag.warn{
     background:#FBE3D6;
@@ -168,15 +191,17 @@
   .empty{
     text-align:center;
     color:var(--text2);
-    font-size:13px;
-    padding:40px 0;
+    font-size:13.5px;
+    padding:50px 20px;
     display:none;
+    line-height:1.6;
   }
   footer{
     text-align:center;
     color:var(--text2);
-    font-size:11px;
-    padding:24px 20px 10px;
+    font-size:11.5px;
+    padding:22px 20px calc(16px + env(safe-area-inset-bottom));
+    line-height:1.6;
   }
 </style>
 </head>
@@ -185,10 +210,12 @@
 <header>
   <h1>刷卡查詢</h1>
   <p>依 2026/08 帳單整理・九張卡＋悠遊付分工</p>
-  <input id="search" type="text" placeholder="輸入消費地點,例如 全聯、7-11、ChatGPT">
+  <input id="search" type="text" inputmode="search" placeholder="輸入消費地點,例如 全聯、7-11、ChatGPT">
 </header>
 
-<div class="tabs" id="tabs"></div>
+<div class="tabs-wrap">
+  <div class="tabs" id="tabs"></div>
+</div>
 
 <main>
   <div id="list"></div>
@@ -255,7 +282,7 @@ groups.forEach(g=>{
 });
 
 let lastGroup = null;
-data.forEach((item, idx)=>{
+data.forEach((item)=>{
   if(item.group !== lastGroup){
     const gt = document.createElement('div');
     gt.className = 'group-title';
