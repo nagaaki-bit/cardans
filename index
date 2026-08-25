@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>刷卡查詢</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;700&family=Noto+Sans+TC:wght@400;500;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#12233D;
+    --ink2:#1B3358;
+    --paper:#F6F3EC;
+    --card:#FFFFFF;
+    --gold:#B8862E;
+    --gold-l:#F0E2C4;
+    --gold-d:#7A5A1E;
+    --line:#DAD4C4;
+    --text:#1E1B16;
+    --text2:#5C574C;
+    --green:#2F6B4F;
+    --green-l:#DCEEE3;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{
+    margin:0;
+    background:var(--paper);
+    font-family:'Noto Sans TC',sans-serif;
+    color:var(--text);
+    padding-bottom:60px;
+  }
+  header{
+    background:var(--ink);
+    padding:28px 20px 22px;
+    position:sticky;
+    top:0;
+    z-index:10;
+  }
+  header h1{
+    font-family:'Noto Serif TC',serif;
+    color:#F6F3EC;
+    font-size:22px;
+    margin:0 0 4px;
+    letter-spacing:0.02em;
+  }
+  header p{
+    color:#9FB0C9;
+    font-size:12.5px;
+    margin:0 0 14px;
+  }
+  #search{
+    width:100%;
+    padding:11px 14px;
+    border-radius:10px;
+    border:none;
+    font-size:15px;
+    font-family:inherit;
+    background:#1F3served;
+  }
+  #search{
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.15);
+    color:#F6F3EC;
+  }
+  #search::placeholder{color:#7F91AC;}
+  .tabs{
+    display:flex;
+    gap:6px;
+    overflow-x:auto;
+    padding:14px 20px 0;
+    scrollbar-width:none;
+  }
+  .tabs::-webkit-scrollbar{display:none;}
+  .tab{
+    flex:0 0 auto;
+    padding:7px 14px;
+    border-radius:999px;
+    border:1px solid var(--line);
+    background:var(--card);
+    font-size:13px;
+    color:var(--text2);
+    white-space:nowrap;
+    cursor:pointer;
+  }
+  .tab.active{
+    background:var(--ink);
+    color:#F6F3EC;
+    border-color:var(--ink);
+  }
+  main{padding:16px 20px 0;}
+  .group-title{
+    font-family:'Noto Serif TC',serif;
+    font-weight:700;
+    font-size:14px;
+    color:var(--gold-d);
+    margin:22px 0 10px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .group-title::after{
+    content:"";
+    flex:1;
+    height:1px;
+    background:var(--line);
+  }
+  .item{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:14px 16px;
+    margin-bottom:10px;
+    display:none;
+  }
+  .item.show{display:block;}
+  .item-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:10px;
+  }
+  .cat{
+    font-size:15.5px;
+    font-weight:700;
+    color:var(--text);
+  }
+  .rate{
+    font-family:'JetBrains Mono',monospace;
+    font-weight:700;
+    font-size:17px;
+    color:var(--green);
+    white-space:nowrap;
+  }
+  .card-line{
+    margin-top:6px;
+    font-size:13.5px;
+    color:var(--ink2);
+    font-weight:500;
+  }
+  .pay-line{
+    margin-top:2px;
+    font-size:12.5px;
+    color:var(--text2);
+  }
+  .tags{
+    margin-top:9px;
+    display:flex;
+    gap:6px;
+    flex-wrap:wrap;
+  }
+  .tag{
+    font-size:10.5px;
+    padding:3px 8px;
+    border-radius:6px;
+    background:var(--gold-l);
+    color:var(--gold-d);
+    font-weight:500;
+  }
+  .tag.warn{
+    background:#FBE3D6;
+    color:#8A3A16;
+  }
+  .tag.stable{
+    background:var(--green-l);
+    color:var(--green);
+  }
+  .empty{
+    text-align:center;
+    color:var(--text2);
+    font-size:13px;
+    padding:40px 0;
+    display:none;
+  }
+  footer{
+    text-align:center;
+    color:var(--text2);
+    font-size:11px;
+    padding:24px 20px 10px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>刷卡查詢</h1>
+  <p>依 2026/08 帳單整理・九張卡＋悠遊付分工</p>
+  <input id="search" type="text" placeholder="輸入消費地點,例如 全聯、7-11、ChatGPT">
+</header>
+
+<div class="tabs" id="tabs"></div>
+
+<main>
+  <div id="list"></div>
+  <div class="empty" id="empty">找不到符合的項目,試試別的關鍵字</div>
+</main>
+
+<footer>切換卡片方案請記得:Cube維持常用方案・Richart固定天天刷</footer>
+
+<script>
+const data = [
+  {group:"超商超市", cat:"全聯", card:"國泰Cube卡", pay:"直接刷實體卡（集精選）", rate:"2%", tags:[["常態","stable"]]},
+  {group:"超商超市", cat:"7-11", card:"台新Richart卡", pay:"台新Pay（天天刷,勿用OPEN錢包）", rate:"3.3-3.8%", tags:[["至2027/03","warn"]]},
+  {group:"超商超市", cat:"全家", card:"玉山Pi錢包卡", pay:"Pi拍錢包App付款", rate:"5%", tags:[["至8/31","warn"],["上限100P幣/月",""]]},
+  {group:"超商超市", cat:"美廉社/統康", card:"玉山UBear卡", pay:"LINE Pay綁UBear卡付款", rate:"3%", tags:[["至8/31","warn"],["上限150元",""]]},
+  {group:"超商超市", cat:"萊爾富", card:"中信LINE Pay卡", pay:"直接刷卡", rate:"1%", tags:[["常態","stable"]]},
+
+  {group:"交通停車", cat:"Autopass公有停車", card:"台新Richart卡", pay:"車麻吉App（天天刷）", rate:"3.3-3.8%", tags:[["至2027/03","warn"],["私營場站留意5%平台費",""]]},
+  {group:"交通停車", cat:"台鐵/高鐵訂票", card:"國泰Cube卡", pay:"直接刷卡（趣旅行）", rate:"2-3%", tags:[["常態","stable"]]},
+  {group:"交通停車", cat:"ETC(eTag)", card:"中信LINE Pay卡", pay:"直接刷卡", rate:"1%", tags:[["常態","stable"]]},
+  {group:"交通停車", cat:"路邊停車(非Autopass)", card:"悠遊付", pay:"綁銀行帳戶,App查詢繳費", rate:"2-7%", tags:[["需手動操作",""]]},
+
+  {group:"數位訂閱", cat:"ChatGPT", card:"玉山UBear卡", pay:"直接刷卡", rate:"10%", tags:[["長期有效","stable"],["月共用上限100元",""]]},
+  {group:"數位訂閱", cat:"Netflix", card:"玉山UBear卡", pay:"直接刷卡", rate:"10%", tags:[["長期有效","stable"],["與ChatGPT共用上限",""]]},
+  {group:"數位訂閱", cat:"Google Gemini", card:"玉山UBear卡", pay:"直接刷卡", rate:"10%", tags:[["長期有效","stable"],["共用月上限",""]]},
+  {group:"數位訂閱", cat:"Steam / Nintendo / PlayStation", card:"玉山UBear卡", pay:"直接刷卡", rate:"10%", tags:[["長期有效","stable"],["共用月上限",""]]},
+  {group:"數位訂閱", cat:"Disney+ / Apple服務 / YouTube / Amazon", card:"中信LINE Pay卡", pay:"直接刷卡（不進UBear清單,保底）", rate:"1%", tags:[["不切Cube玩數位",""]]},
+
+  {group:"網路購物", cat:"蝦皮購物", card:"玉山UBear卡", pay:"直接刷卡（網購3%）", rate:"3%", tags:[["常態","stable"]]},
+  {group:"網路購物", cat:"momo購物網", card:"玉山UBear卡", pay:"直接刷卡（網購3%）", rate:"3%", tags:[["常態","stable"]]},
+  {group:"網路購物", cat:"PChome 24", card:"玉山UBear卡", pay:"直接刷卡（網購3%）", rate:"3%", tags:[["常態","stable"]]},
+
+  {group:"生活繳費", cat:"電信費", card:"悠遊付", pay:"綁銀行帳戶,每月1/11/21日繳", rate:"2-7%", tags:[["需手動操作",""]]},
+  {group:"生活繳費", cat:"悠遊卡加值", card:"悠遊付", pay:"App加值機,併同一天處理", rate:"2-7%", tags:[["需手動操作",""]]},
+  {group:"生活繳費", cat:"水電瓦斯/健保費", card:"悠遊付", pay:"併同一天繳費", rate:"2-3%", tags:[["需手動操作",""]]},
+
+  {group:"加油餐飲", cat:"中油加油", card:"中油聯名卡", pay:"中油Pay先儲值再加油", rate:"最高6.8%", tags:[["常態","stable"]]},
+  {group:"加油餐飲", cat:"一般餐飲", card:"中信LINE Pay卡", pay:"直接刷卡（不特地切Cube）", rate:"1%", tags:[["不優先切換",""],["剛好在樂饗購可拿3%",""]]},
+  {group:"加油餐飲", cat:"UberEats", card:"中信LINE Pay卡", pay:"LINE Pay App付款", rate:"1%", tags:[["5%需登錄故不計",""]]},
+
+  {group:"其他雜項", cat:"運動中心", card:"中信LINE Pay卡", pay:"直接刷卡", rate:"1%", tags:[["Cube無對應通路,若知道店名可再查",""]]},
+  {group:"其他雜項", cat:"醫療/百貨", card:"中信LINE Pay卡", pay:"直接刷卡", rate:"1%", tags:[["常態","stable"]]},
+  {group:"其他雜項", cat:"日韓泰旅遊消費", card:"富邦J卡", pay:"直接刷卡", rate:"3%", tags:[["電子帳單條件",""],["特定場景卡",""]]},
+  {group:"其他雜項", cat:"日本樂天購物", card:"樂天信用卡", pay:"直接刷卡", rate:"依通路而定", tags:[["特定場景卡",""]]}
+];
+
+const groups = ["全部", ...new Set(data.map(d=>d.group))];
+const tabsEl = document.getElementById('tabs');
+const listEl = document.getElementById('list');
+const emptyEl = document.getElementById('empty');
+const searchEl = document.getElementById('search');
+let activeGroup = "全部";
+
+groups.forEach(g=>{
+  const t = document.createElement('div');
+  t.className = 'tab' + (g==="全部" ? " active" : "");
+  t.textContent = g;
+  t.onclick = ()=>{
+    activeGroup = g;
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    render();
+  };
+  tabsEl.appendChild(t);
+});
+
+let lastGroup = null;
+data.forEach((item, idx)=>{
+  if(item.group !== lastGroup){
+    const gt = document.createElement('div');
+    gt.className = 'group-title';
+    gt.textContent = item.group;
+    gt.dataset.group = item.group;
+    listEl.appendChild(gt);
+    lastGroup = item.group;
+  }
+  const el = document.createElement('div');
+  el.className = 'item';
+  el.dataset.group = item.group;
+  el.dataset.search = (item.cat + item.card).toLowerCase();
+  const tagsHtml = item.tags.map(t=>`<span class="tag ${t[1]}">${t[0]}</span>`).join('');
+  el.innerHTML = `
+    <div class="item-top">
+      <span class="cat">${item.cat}</span>
+      <span class="rate">${item.rate}</span>
+    </div>
+    <div class="card-line">${item.card}</div>
+    <div class="pay-line">${item.pay}</div>
+    <div class="tags">${tagsHtml}</div>
+  `;
+  listEl.appendChild(el);
+});
+
+function render(){
+  const q = searchEl.value.trim().toLowerCase();
+  let anyShown = false;
+  document.querySelectorAll('.group-title').forEach(gt=>{
+    gt.style.display = (activeGroup==="全部" || activeGroup===gt.dataset.group) ? "flex" : "none";
+  });
+  document.querySelectorAll('.item').forEach(el=>{
+    const groupMatch = activeGroup==="全部" || activeGroup===el.dataset.group;
+    const searchMatch = !q || el.dataset.search.includes(q);
+    const show = groupMatch && searchMatch;
+    el.classList.toggle('show', show);
+    if(show) anyShown = true;
+  });
+  if(q){
+    document.querySelectorAll('.group-title').forEach(gt=>{
+      const groupHasVisible = [...document.querySelectorAll(`.item[data-group="${gt.dataset.group}"]`)].some(el=>el.classList.contains('show'));
+      if(!groupHasVisible) gt.style.display = "none";
+    });
+  }
+  emptyEl.style.display = anyShown ? "none" : "block";
+}
+
+searchEl.addEventListener('input', render);
+render();
+</script>
+</body>
+</html>
