@@ -34,10 +34,13 @@
   }
   header{
     background:var(--ink);
-    padding:calc(20px + env(safe-area-inset-top)) 18px 14px;
-    position:sticky;
-    top:0;
-    z-index:10;
+    padding:calc(20px + env(safe-area-inset-top)) 18px 16px;
+  }
+  .header-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:12px;
   }
   header h1{
     font-family:'Noto Serif TC',serif;
@@ -49,34 +52,56 @@
   header p{
     color:#9FB0C9;
     font-size:12px;
-    margin:0 0 12px;
+    margin:0;
     line-height:1.4;
   }
-  #search{
-    width:100%;
-    padding:12px 14px;
-    border-radius:10px;
-    font-size:16px;
-    font-family:inherit;
-    background:rgba(255,255,255,0.09);
-    border:1px solid rgba(255,255,255,0.18);
-    color:#F6F3EC;
-    -webkit-appearance:none;
-    appearance:none;
-    display:block;
+  .tab-all{
+    flex:0 0 auto;
+    padding:7px 17px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,0.22);
+    background:rgba(255,255,255,0.08);
+    font-size:12.5px;
+    color:#E8EDF5;
+    cursor:pointer;
+    user-select:none;
+    white-space:nowrap;
+    margin-top:2px;
   }
-  #search::placeholder{color:#8A9BB8;}
-  #search:focus{outline:none;border-color:var(--gold);background:rgba(255,255,255,0.13);}
+  .tab-all:active{transform:scale(0.96);}
+  .tab-all.active{
+    background:var(--gold);
+    color:var(--ink);
+    border-color:var(--gold);
+    font-weight:700;
+  }
+  .label-icon{
+    display:inline-flex;
+    vertical-align:-3px;
+    margin-right:6px;
+  }
   .tabs-wrap{
     background:var(--paper);
-    padding:10px 0 8px;
+    padding:12px 0 8px;
     border-bottom:1px solid var(--line);
+  }
+  .tabs-label{
+    font-size:11px;
+    color:var(--text2);
+    padding:0 18px 6px;
+    font-weight:500;
+    display:flex;
+    align-items:center;
+    gap:0;
   }
   .tabs{
     display:grid;
     grid-template-columns:repeat(2, minmax(0,1fr));
     gap:8px;
     padding:0 18px;
+  }
+  .tabs.cardtabs{
+    margin-top:10px;
   }
   .tab{
     padding:10px 12px;
@@ -100,6 +125,10 @@
     color:#F6F3EC;
     border-color:var(--ink);
     font-weight:500;
+  }
+  .tab.gold.active{
+    background:var(--gold-d);
+    border-color:var(--gold-d);
   }
   main{padding:14px 16px 0;}
   .group-title{
@@ -175,13 +204,84 @@
     font-weight:500;
     line-height:1.4;
   }
-  .tag.warn{
-    background:#FBE3D6;
-    color:#8A3A16;
+  .tag.warn{background:#FBE3D6;color:#8A3A16;}
+  .tag.stable{background:var(--green-l);color:var(--green);}
+
+  /* ---- 卡片用法說明頁 ---- */
+  .guide{display:none;}
+  .guide.show{display:block;}
+  .guide-hero{
+    background:var(--ink);
+    color:#F6F3EC;
+    border-radius:16px;
+    padding:18px 18px;
+    margin-bottom:16px;
   }
-  .tag.stable{
-    background:var(--green-l);
+  .guide-hero .name{
+    font-family:'Noto Serif TC',serif;
+    font-size:19px;
+    font-weight:700;
+    margin-bottom:4px;
+  }
+  .guide-hero .default{
+    font-size:13px;
+    color:#C9D6E8;
+    line-height:1.6;
+  }
+  .guide-hero .default b{color:var(--gold);font-weight:700;}
+  .plan{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:14px 16px;
+    margin-bottom:10px;
+  }
+  .plan-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+    margin-bottom:6px;
+  }
+  .plan-name{
+    font-size:15px;
+    font-weight:700;
+  }
+  .plan-rate{
+    font-family:'JetBrains Mono',monospace;
+    font-weight:700;
+    font-size:16px;
     color:var(--green);
+    white-space:nowrap;
+  }
+  .plan-cover{
+    font-size:13px;
+    color:var(--ink2);
+    font-weight:500;
+    margin-bottom:4px;
+    line-height:1.45;
+  }
+  .plan-note{
+    font-size:12.5px;
+    color:var(--text2);
+    line-height:1.5;
+  }
+  .howto{
+    background:var(--gold-l);
+    border-radius:14px;
+    padding:14px 16px;
+    margin-top:14px;
+  }
+  .howto-title{
+    font-size:13px;
+    font-weight:700;
+    color:var(--gold-d);
+    margin-bottom:6px;
+  }
+  .howto-text{
+    font-size:13px;
+    color:#5C4A1E;
+    line-height:1.6;
   }
   .empty{
     text-align:center;
@@ -203,18 +303,26 @@
 <body>
 
 <header>
-  <h1>刷卡查詢</h1>
-  <p>依 2026/08 帳單整理・九張卡＋悠遊付分工</p>
-  <input id="search" type="text" inputmode="search" placeholder="輸入消費地點,例如 全聯、7-11、ChatGPT">
+  <div class="header-row">
+    <div>
+      <h1>刷卡查詢</h1>
+      <p>依 2026/08 帳單整理・九張卡＋悠遊付分工</p>
+    </div>
+    <span class="tab-all active" id="tabAll">全部</span>
+  </div>
 </header>
 
 <div class="tabs-wrap">
+  <div class="tabs-label"><svg class="label-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="5" width="20" height="14" rx="2.5" stroke="currentColor" stroke-width="1.8"/><path d="M2 9.5H22" stroke="currentColor" stroke-width="1.8"/><path d="M5.5 14.5H9.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>消費類別</span></div>
   <div class="tabs" id="tabs"></div>
+  <div class="tabs-label" style="margin-top:12px;"><svg class="label-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 4.5C4 3.7 4.7 3 5.5 3H12V20H5.5C4.7 20 4 20.7 4 21.5V4.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M20 4.5C20 3.7 19.3 3 18.5 3H12V20H18.5C19.3 20 20 20.7 20 21.5V4.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg><span>卡片／平台用法說明</span></div>
+  <div class="tabs cardtabs" id="cardtabs"></div>
 </div>
 
 <main>
   <div id="list"></div>
-  <div class="empty" id="empty">找不到符合的項目,試試別的關鍵字</div>
+  <div id="guides"></div>
+  <div class="empty" id="empty">找不到符合的項目</div>
 </main>
 
 <footer>切換卡片方案請記得:Cube維持常用方案・Richart固定天天刷</footer>
@@ -231,6 +339,7 @@ const data = [
   {group:"交通停車", cat:"台鐵/高鐵訂票", card:"國泰Cube卡", pay:"直接刷卡（趣旅行）", rate:"2-3%", tags:[["常態","stable"]]},
   {group:"交通停車", cat:"ETC(eTag)", card:"中信LINE Pay卡", pay:"直接刷卡", rate:"1%", tags:[["常態","stable"]]},
   {group:"交通停車", cat:"路邊停車(非Autopass)", card:"悠遊付", pay:"綁銀行帳戶,App查詢繳費", rate:"2-7%", tags:[["需手動操作",""]]},
+  {group:"交通停車", cat:"捷運搭乘", card:"悠遊卡本身", pay:"實體卡或悠遊付乘車碼(勿用信用卡感應)", rate:"保留常客優惠", tags:[["感應搭乘拿不到常客回饋","warn"]]},
 
   {group:"數位訂閱", cat:"ChatGPT", card:"玉山UBear卡", pay:"直接刷卡", rate:"10%", tags:[["長期有效","stable"],["月共用上限100元",""]]},
   {group:"數位訂閱", cat:"Netflix", card:"玉山UBear卡", pay:"直接刷卡", rate:"10%", tags:[["長期有效","stable"],["與ChatGPT共用上限",""]]},
@@ -256,24 +365,93 @@ const data = [
   {group:"其他雜項", cat:"日本樂天購物", card:"樂天信用卡", pay:"直接刷卡", rate:"依通路而定", tags:[["特定場景卡",""]]}
 ];
 
-const groups = ["全部", ...new Set(data.map(d=>d.group))];
+const guides = {
+  "cube": {
+    name:"國泰Cube卡",
+    default:"固定停在 <b>集精選</b> 當日常預設，僅在旅遊/餐飲/網購訂閱當天視情況切換",
+    plans:[
+      {name:"集精選", rate:"2%", cover:"全聯、超商（全家/7-11）、停車場、電動車充電", note:"不分等級都是2%，是唯一常態使用的方案；若走全支付App結帳到全聯/大全聯，需另切「全支付」方案（2026/4/22-12/31限時）才有效，兩者互斥"},
+      {name:"玩數位", rate:"2-3%", cover:"網購／影音類（Apple、YouTube、Amazon等，實際認列以系統判定為準）", note:"因不想頻繁切換,目前已改為保留LINE Pay卡1%保底,不特地切這個方案"},
+      {name:"趣旅行", rate:"2-3%", cover:"台鐵、易遊網等旅遊訂票", note:"出發或訂票前記得切過去"},
+      {name:"樂饗購", rate:"最高3%", cover:"餐飲、外送", note:"不優先為了餐飲切換,剛好在這個方案時才吃得到"}
+    ],
+    howto:"打開 Cube App →「轉換權益」→ 選擇方案 → 確認。每天限切換一次，當天00:00-23:59生效，不需另外登錄任何活動。"
+  },
+  "richart": {
+    name:"台新Richart卡",
+    default:"永遠固定停在 <b>天天刷</b>，不因訂閱或購物任意切換，只有ChatGPT扣款前後才短暫切數趣刷",
+    plans:[
+      {name:"天天刷", rate:"3.3%（設定自動扣繳後3.8%）", cover:"7-11／全家（限台新Pay）、通勤交通、加油充電（含Autopass車麻吉）、藥妝", note:"這是您的核心固定方案，Autopass每1-3天扣款一次，7-11消費務必用台新Pay付款，不要用OPEN錢包"},
+      {name:"數趣刷", rate:"3.3%（設定後3.8%）", cover:"蝦皮、momo、ChatGPT、Netflix、Disney+等網購/數位訂閱", note:"有效期至2027/03/31；只在ChatGPT扣款日前後3天短暫切過去，用完立刻切回天天刷"},
+      {name:"假日刷", rate:"2%", cover:"六日／國定假日不限通路", note:"不用切換方案、不挑支付工具，臨時消費最方便的選項"},
+      {name:"海外消費", rate:"最高8.5%", cover:"出國實體消費", note:"需先在Richart外幣帳戶存滿700美元並完成活動登錄，出國前記得準備好"}
+    ],
+    howto:"打開 Richart Life App →「轉換權益」→ 選擇方案。切換依授權日認定，當天23:59前切換即可，設定自動扣繳信用卡帳款是一次性動作，不用重複登錄。"
+  },
+  "youyoufu": {
+    name:"悠遊付平台",
+    default:"綁定<b>銀行帳戶</b>（不綁信用卡），每月固定1號、11號、21號集中處理所有生活繳費",
+    plans:[
+      {name:"逢1繳費", rate:"2%", cover:"電信費、水電瓦斯、健保費、悠遊卡加值、路邊停車費等生活繳費", note:"每月1/11/21/31日限定，每日回饋總額全體會員共用上限NT$7萬，先繳先得；活動可能不定期更新，建議繳費前到App確認當期公告"},
+      {name:"月級挑戰", rate:"最高2.5-3%", cover:"依前月消費筆數/金額分級（銀/金/白金）", note:"僅認悠遊付錢包餘額或銀行帳戶扣款交易，綁信用卡不列入資格"},
+      {name:"週五會員日", rate:"2%", cover:"每週五消費", note:"每帳戶上限NT$100/週五，可與其他活動疊加"}
+    ],
+    howto:"打開悠遊付App →「生活繳費」→ 選擇項目（水費/電費/健保費/停車費等）→ 輸入帳號或掃碼查詢帳單 → 選付款方式（銀行帳戶）→ 確認繳費。這是手動操作，不是自動扣繳，每期都要記得繳。"
+  }
+};
+
+const groups = [...new Set(data.map(d=>d.group))];
 const tabsEl = document.getElementById('tabs');
+const cardtabsEl = document.getElementById('cardtabs');
 const listEl = document.getElementById('list');
+const guidesEl = document.getElementById('guides');
 const emptyEl = document.getElementById('empty');
-const searchEl = document.getElementById('search');
+const tabAllEl = document.getElementById('tabAll');
 let activeGroup = "全部";
+let activeGuide = null;
+
+function clearActive(){
+  document.querySelectorAll('.tab, .tab-all').forEach(x=>x.classList.remove('active'));
+}
+
+tabAllEl.onclick = ()=>{
+  activeGroup = "全部";
+  activeGuide = null;
+  clearActive();
+  tabAllEl.classList.add('active');
+  render();
+};
 
 groups.forEach(g=>{
   const t = document.createElement('div');
-  t.className = 'tab' + (g==="全部" ? " active" : "");
+  t.className = 'tab';
   t.textContent = g;
   t.onclick = ()=>{
     activeGroup = g;
-    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    activeGuide = null;
+    clearActive();
     t.classList.add('active');
     render();
   };
   tabsEl.appendChild(t);
+});
+
+const cardTabDefs = [
+  {key:"cube", label:"國泰Cube卡"},
+  {key:"richart", label:"台新Richart卡"},
+  {key:"youyoufu", label:"悠遊付平台"}
+];
+cardTabDefs.forEach(def=>{
+  const t = document.createElement('div');
+  t.className = 'tab gold';
+  t.textContent = def.label;
+  t.onclick = ()=>{
+    activeGuide = def.key;
+    clearActive();
+    t.classList.add('active');
+    render();
+  };
+  cardtabsEl.appendChild(t);
 });
 
 let lastGroup = null;
@@ -289,7 +467,6 @@ data.forEach((item)=>{
   const el = document.createElement('div');
   el.className = 'item';
   el.dataset.group = item.group;
-  el.dataset.search = (item.cat + item.card).toLowerCase();
   const tagsHtml = item.tags.map(t=>`<span class="tag ${t[1]}">${t[0]}</span>`).join('');
   el.innerHTML = `
     <div class="item-top">
@@ -303,29 +480,51 @@ data.forEach((item)=>{
   listEl.appendChild(el);
 });
 
+Object.keys(guides).forEach(key=>{
+  const g = guides[key];
+  const el = document.createElement('div');
+  el.className = 'guide';
+  el.dataset.key = key;
+  const plansHtml = g.plans.map(p=>`
+    <div class="plan">
+      <div class="plan-top">
+        <span class="plan-name">${p.name}</span>
+        <span class="plan-rate">${p.rate}</span>
+      </div>
+      <div class="plan-cover">${p.cover}</div>
+      <div class="plan-note">${p.note}</div>
+    </div>
+  `).join('');
+  el.innerHTML = `
+    <div class="guide-hero">
+      <div class="name">${g.name}</div>
+      <div class="default">${g.default}</div>
+    </div>
+    ${plansHtml}
+    <div class="howto">
+      <div class="howto-title">切換方法</div>
+      <div class="howto-text">${g.howto}</div>
+    </div>
+  `;
+  guidesEl.appendChild(el);
+});
+
 function render(){
-  const q = searchEl.value.trim().toLowerCase();
-  let anyShown = false;
   document.querySelectorAll('.group-title').forEach(gt=>{
-    gt.style.display = (activeGroup==="全部" || activeGroup===gt.dataset.group) ? "flex" : "none";
+    gt.style.display = (!activeGuide && (activeGroup==="全部" || activeGroup===gt.dataset.group)) ? "flex" : "none";
   });
+  let anyShown = false;
   document.querySelectorAll('.item').forEach(el=>{
-    const groupMatch = activeGroup==="全部" || activeGroup===el.dataset.group;
-    const searchMatch = !q || el.dataset.search.includes(q);
-    const show = groupMatch && searchMatch;
+    const show = !activeGuide && (activeGroup==="全部" || activeGroup===el.dataset.group);
     el.classList.toggle('show', show);
     if(show) anyShown = true;
   });
-  if(q){
-    document.querySelectorAll('.group-title').forEach(gt=>{
-      const groupHasVisible = [...document.querySelectorAll(`.item[data-group="${gt.dataset.group}"]`)].some(el=>el.classList.contains('show'));
-      if(!groupHasVisible) gt.style.display = "none";
-    });
-  }
-  emptyEl.style.display = anyShown ? "none" : "block";
+  document.querySelectorAll('.guide').forEach(el=>{
+    el.classList.toggle('show', activeGuide===el.dataset.key);
+  });
+  emptyEl.style.display = (!activeGuide && !anyShown) ? "block" : "none";
 }
 
-searchEl.addEventListener('input', render);
 render();
 </script>
 </body>
